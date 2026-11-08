@@ -3,6 +3,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { buildLetterShape, buildLayers } from './geometry2d.js';
 import { toSTL, to3MF, download } from './export.js';
+import { t, fmt, parseNum, applyStatic, setLang, onLangChange, lang } from './i18n.js';
 
 // ---------------------------------------------------------------- state
 
@@ -14,7 +15,7 @@ const FONTS = [
 ];
 
 const DEFAULTS = {
-  text: 'Hallo',
+  text: lang === 'de' ? 'Hallo' : 'Hello',
   font: 'TitanOne',
   style: 'inflated',
   width: 120,
@@ -290,7 +291,7 @@ async function getFont(id) {
   if (!fontCache.has(id)) {
     const f = FONTS.find((x) => x.id === id);
     fontCache.set(id, fetch(`fonts/${f.file}`).then((r) => {
-      if (!r.ok) throw new Error(`Schrift ${f.name} nicht gefunden`);
+      if (!r.ok) throw new Error(t('err.fontMissing', { name: f.name }));
       return r.arrayBuffer();
     }).then((b) => opentype.parse(b)));
   }
@@ -302,7 +303,14 @@ async function getFont(id) {
 const $status = document.getElementById('status');
 const $dims = document.getElementById('dims');
 const $warnings = document.getElementById('warnings');
-const fmt = new Intl.NumberFormat('de-DE', { maximumFractionDigits: 1 });
+
+// Status line: remember the key so a language switch can re-render it.
+let lastStatus = null;
+function setStatus(key, vars) {
+  lastStatus = key ? [key, vars] : null;
+  $status.textContent = key ? t(key, vars) : '';
+}
+function setStatusRaw(text) { lastStatus = null; $status.textContent = text; }
 
 let shapeCache = { key: '', shape: null };
 async function compute2D() {
@@ -313,8 +321,12 @@ async function compute2D() {
   return buildLayers(shapeCache.shape, { ...state, bed: Number(state.bed) });
 }
 
-function showWarnings(list) {
+let lastWarnings = [];
+function showWarnings(codes, force = false) {
+  lastWarnings = codes;
+  const list = codes.map((w) => t(w.id, { ...w, bed: w.bed != null ? fmt.format(w.bed) : undefined }));
   const current = [...$warnings.children].map((li) => li.textContent);
+  if (force) current.length = 0;
   if (current.join('|') === list.join('|')) return;
   $warnings.replaceChildren(...list.map((w) => Object.assign(document.createElement('li'), { textContent: w })));
 }
@@ -328,7 +340,7 @@ async function pump() {
   busy = true;
   while (dirty) {
     dirty = false;
-    try { await rebuild(); } catch (err) { console.error(err); $status.textContent = err.message; }
+    try { await rebuild(); } catch (err) { console.error(err); setStatusRaw(err.message); }
   }
   busy = false;
 }
@@ -339,7 +351,7 @@ async function rebuild() {
     showMeshes([]);
     $dims.textContent = '–';
     showWarnings([]);
-    $status.textContent = result ? 'Text eingeben' : 'Schrift wird geladen …';
+    setStatus(result ? 'status.enterText' : 'status.loadingFont');
     return;
   }
   const { layers, warnings, info } = result;
@@ -351,18 +363,18 @@ async function rebuild() {
   const vol = info.width * info.depth * info.height;
   const coarse = Math.max(Math.min(0.9, Math.max(0.3, maxDim / 200)), Math.cbrt(vol / 2e6));
   const fine = Math.max(Math.min(0.4, Math.max(0.16, maxDim / 520)), Math.cbrt(vol / 12e6));
-  $status.textContent = 'Berechne Vorschau …';
+  setStatus('status.computing');
   const meshes = await previewMesher.run(layers, coarse, 'parts');
   if (dirty) return; // a newer request is waiting – don't flash stale geometry
   showMeshes(meshes);
   placeCamera(info);
-  $status.textContent = 'Verfeinere …';
+  setStatus('status.refining');
   await new Promise((r) => setTimeout(r, 120));
   if (dirty) return;
   const detailed = await previewMesher.run(layers, fine, 'parts');
   if (dirty) return;
   showMeshes(detailed);
-  $status.textContent = 'Vorschau';
+  setStatus('status.preview');
 }
 
 function placeCamera(info) {
@@ -377,33 +389,34 @@ function placeCamera(info) {
 // ---------------------------------------------------------------- print recommendations
 
 const $tips = document.getElementById('tips');
+let lastTipsInfo = null;
 function renderTips(info) {
+  lastTipsInfo = info;
   const inflated = state.style === 'inflated';
   const small = Math.max(info.width, info.depth) < 80;
   const hasBase = state.plate.on || state.outline.on;
   const layer = inflated ? 0.12 : 0.16;
   const mm = (v) => `${fmt.format(v)} mm`;
   const rows = [
-    ['Ausrichtung', 'Flach aufs Bett', 'Unterseite ist eben – keine Stützen nötig.'],
-    ['Schichthöhe', mm(layer), inflated ? 'Feine Schichten machen die Kuppeln glatt (Profil „0.12mm Fine“).' : 'Profil „0.16mm Optimal“.'],
-    ['Wände', small ? '4' : '3', small ? 'Kleine Teile werden dadurch stabil.' : ''],
-    ['Obere Schichten', inflated ? '7' : '5', inflated ? 'Auf flach geneigten Kuppeln scheint sonst die Füllung durch.' : ''],
-    ['Füllung', `${small || state.keyring.on ? 20 : 12} % Gyroid`, ''],
+    [t('tip.orientation'), t('tip.orientation.v'), t('tip.orientation.n')],
+    [t('tip.layer'), mm(layer), inflated ? t('tip.layer.nInflated') : t('tip.layer.nFlat')],
+    [t('tip.walls'), small ? '4' : '3', small ? t('tip.walls.nSmall') : ''],
+    [t('tip.top'), inflated ? '7' : '5', inflated ? t('tip.top.n') : ''],
+    [t('tip.infill'), `${small || state.keyring.on ? 20 : 12} % Gyroid`, ''],
   ];
   const thinEdge = inflated && state.edge < 1 && !hasBase;
-  if (thinEdge) rows.push(['Brim', '5 mm', 'Die Randhöhe ist niedrig – der Brim hält die Kante am Bett.']);
-  else if (small && !state.plate.on) rows.push(['Brim', '3 mm', 'Kleine Grundfläche – hilft gegen Ablösen.']);
-  else rows.push(['Brim', 'Nicht nötig', '']);
-  if (inflated) rows.push(['Außenwand', '≤ 60 mm/s', 'Langsamer = glattere Rundungen.']);
-  rows.push(['Naht', 'Hinten', 'Versteckt die Naht auf der Rückseite der Buchstaben.']);
-  if (hasBase || !inflated) rows.push(['Bügeln', 'Oberste Flächen', state.plate.on ? 'Macht die Sockelplatte glatt.' : 'Für glatte flache Oberseiten.']);
+  if (thinEdge) rows.push(['Brim', '5 mm', t('tip.brim.nThin')]);
+  else if (small && !state.plate.on) rows.push(['Brim', '3 mm', t('tip.brim.nSmall')]);
+  else rows.push(['Brim', t('tip.brim.no'), '']);
+  if (inflated) rows.push([t('tip.outer'), '≤ 60 mm/s', t('tip.outer.n')]);
+  rows.push([t('tip.seam'), t('tip.seam.v'), t('tip.seam.n')]);
+  if (hasBase || !inflated) rows.push([t('tip.ironing'), t('tip.ironing.v'), state.plate.on ? t('tip.ironing.nPlate') : t('tip.ironing.nFlat')]);
   if (hasBase) {
     const z = state.plate.on ? state.plate.thickness : 0;
     const zl = z + (state.outline.on ? state.outline.height : 0);
-    rows.push(['Farbwechsel', `ab ${mm(zl)}`,
-      `Ohne AMS: in der Slicer-Vorschau auf der ersten Schicht über ${mm(zl)} eine Pause/Farbwechsel einfügen. Mit AMS: 3MF laden und jedem Teil ein Filament geben.`]);
+    rows.push([t('tip.color'), t('tip.color.v', { z: mm(zl) }), t('tip.color.n', { z: mm(zl) })]);
   }
-  rows.push(['Druckplatte', 'Glatte PEI', 'Glänzende Unterseite; texturierte PEI gibt eine Struktur.']);
+  rows.push([t('tip.plate'), t('tip.plate.v'), t('tip.plate.n')]);
   $tips.replaceChildren(...rows.map(([k, v, note]) => {
     const row = document.createElement('div');
     row.className = 'tip';
@@ -434,8 +447,8 @@ async function exportFile(kind, btn) {
   const label = btn.textContent;
   btn.classList.add('busy');
   btn.style.setProperty('--p', 0);
-  btn.textContent = 'Berechne …';
-  $status.textContent = `Export mit ${fmt.format(h)} mm Auflösung …`;
+  btn.textContent = t('status.exportBtn');
+  setStatus('status.exporting', { h: fmt.format(h) });
   try {
     const meshes = await exportMesher.run(layers, h, kind === 'stl' ? 'union' : 'parts',
       (p) => btn.style.setProperty('--p', p.toFixed(3)));
@@ -443,13 +456,13 @@ async function exportFile(kind, btn) {
     const tris = meshes.reduce((s, m) => s + m.indices.length / 3, 0);
     if (kind === 'stl') download(toSTL(meshes[0]), `${fileBase()}.stl`);
     else download(to3MF(meshes, { name: state.text.trim() || 'Bubble Letters', bed: Number(state.bed) }), `${fileBase()}.3mf`);
-    $status.textContent = `${kind.toUpperCase()} gesichert · ${fmt.format(Math.round(tris / 1000))}k Dreiecke`;
+    setStatus('status.saved', { kind: kind.toUpperCase(), k: fmt.format(Math.round(tris / 1000)) });
   } catch (err) {
     console.error(err);
-    $status.textContent = `Export fehlgeschlagen: ${err.message}`;
+    setStatus('status.exportFailed', { msg: err.message });
   } finally {
     btn.classList.remove('busy');
-    btn.textContent = label;
+    btn.textContent = btn.dataset.i18n ? t(btn.dataset.i18n) : label;
   }
 }
 document.getElementById('exportStl').addEventListener('click', (e) => exportFile('stl', e.currentTarget));
@@ -481,14 +494,14 @@ function setupNumberFields() {
     num.inputMode = 'decimal';
     num.className = 'num';
     num.dataset.for = key;
-    num.setAttribute('aria-label', `${range.labels?.[0]?.textContent || key} in ${range.dataset.unit || ''}`);
+    num._range = range;
     wrap.append(num, Object.assign(document.createElement('span'), { className: 'unit', textContent: range.dataset.unit || '' }));
     out.replaceWith(wrap);
 
     const min = Number(range.dataset.inputMin ?? range.min);
     const max = Number(range.dataset.inputMax ?? range.max);
     const step = Number(range.step) || 1;
-    const parse = () => Number(num.value.replace(/\s/g, '').replace(',', '.'));
+    const parse = () => parseNum(num.value);
     const commit = (value) => {
       if (!Number.isFinite(value)) { num.classList.add('invalid'); return; }
       num.classList.remove('invalid');
@@ -604,7 +617,7 @@ function renderFonts() {
   const own = document.createElement('button');
   own.className = 'chip';
   own.dataset.font = 'custom';
-  own.textContent = customFont ? customFont.name : 'Eigene …';
+  own.textContent = customFont ? customFont.name : t('font.custom');
   chips.push(own);
   $fonts.replaceChildren(...chips);
   syncFonts();
@@ -624,7 +637,7 @@ $fonts.addEventListener('click', (e) => {
 $fontFile.addEventListener('change', async () => {
   const file = $fontFile.files[0];
   if (!file) return;
-  $status.textContent = `Lade ${file.name} …`;
+  setStatus('status.loadingFile', { name: file.name });
   try {
     const font = opentype.parse(await file.arrayBuffer());
     customFont = { name: file.name.replace(/\.(ttf|otf)$/i, ''), font };
@@ -632,7 +645,7 @@ $fontFile.addEventListener('change', async () => {
     renderFonts();
     requestPreview();
   } catch (err) {
-    $status.textContent = 'Diese Schriftdatei kann nicht gelesen werden.';
+    setStatus('status.badFont');
   }
   $fontFile.value = '';
 });
@@ -664,8 +677,40 @@ document.querySelectorAll('details.group').forEach((det) => {
   });
 });
 
+// Number fields get their accessible name from the slider label (re-done on language change).
+function labelNumberFields() {
+  document.querySelectorAll('input.num').forEach((num) => {
+    const r = num._range;
+    num.setAttribute('aria-label', `${r.labels?.[0]?.textContent || num.dataset.for} ${t('in')} ${r.dataset.unit || ''}`);
+  });
+}
+
+// Language switch
+const $langButtons = document.querySelectorAll('[data-lang]');
+function syncLangButtons() {
+  $langButtons.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.lang === lang)));
+  // keep the language when following the footer links
+  document.querySelectorAll('.panel-foot a').forEach((a) => {
+    a.href = `rechtliches.html?lang=${lang}${a.hash}`;
+  });
+}
+$langButtons.forEach((b) => b.addEventListener('click', () => setLang(b.dataset.lang)));
+onLangChange(() => {
+  syncLangButtons();
+  labelNumberFields();
+  renderFonts();
+  document.querySelectorAll('input[type="range"][data-key]').forEach((r) => renderOutput(r.dataset.key));
+  if (lastTipsInfo) renderTips(lastTipsInfo);
+  showWarnings(lastWarnings, true);
+  if (lastStatus) setStatus(...lastStatus);
+  if (lastInfo) $dims.textContent = `${fmt.format(lastInfo.width)} × ${fmt.format(lastInfo.depth)} × ${fmt.format(lastInfo.height)} mm`;
+});
+
 document.body.classList.add('no-anim'); // no transitions for the initial layout
+applyStatic();
+syncLangButtons();
 setupNumberFields();
+labelNumberFields();
 renderFonts();
 syncAll();
 requestPreview();

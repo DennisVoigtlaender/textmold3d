@@ -15,6 +15,7 @@ Im Projektordner ausführen, dann <http://localhost:8000> öffnen. Alle Librarie
 - **Stil:** *Aufgeblasen* (jeder Buchstabe als eigener Ballon, flache Unterseite) oder *Flach* (extrudiert mit runder Oberkante)
 - **Vorlagen:** Bubble-Name, Namensschild (mit Sockelplatte), Anhänger (mit Outline und Öse)
 - **Extras:** Outline-Rand, Sockelplatte, Schlüsselanhänger-Öse (links oder oben), eigene TTF/OTF-Schrift
+- **Sprachen:** Deutsch und Englisch. Die Sprache wird aus dem Browser erkannt, per DE/EN-Schalter gewählt oder über `?lang=de` / `?lang=en` festgelegt. Alle Texte stehen in `src/i18n.js`.
 - **Export:**
   - **STL:** ein einzelner, wasserdichter Körper, ideal für Einfarbdruck
   - **3MF:** ein Objekt mit mehreren Teilen (Buchstaben / Outline / Sockel). Bambu Studio lädt es als ein Objekt, und du weist jedem Teil ein Filament zu.
@@ -34,5 +35,6 @@ Im Projektordner ausführen, dann <http://localhost:8000> öffnen. Alle Librarie
 | `src/mesher.js` | Distanzfelder + Marching Cubes → wasserdichte Meshes (läuft im Web Worker) |
 | `src/export.js` | Binäres STL und 3MF (fflate) |
 | `src/app.js` | Oberfläche, three.js-Vorschau, Export |
+| `src/i18n.js` | Übersetzungen (DE/EN), Spracherkennung, Zahlenformat |
 
 Schriften: Titan One, Lilita One, Sniglet (SIL Open Font License, je eine `fonts/*-OFL.txt`) und Chewy (Apache 2.0, `fonts/Chewy-LICENSE-Apache2.txt`).

@@ -6,16 +6,20 @@
   <meta name="robots" content="noindex">
   <title>Datenschutz &amp; Lizenzen – TextMold 3D</title>
   <style>
-    :root { --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --text-2: rgba(60,60,67,.72); --line: rgba(60,60,67,.14); --accent: #0071e3; }
+    :root { --bg: #f5f5f7; --card: #fff; --text: #1d1d1f; --text-2: rgba(60,60,67,.72); --line: rgba(60,60,67,.14); --accent: #0071e3; --fill: rgba(118,118,128,.12); --thumb: #fff; }
     @media (prefers-color-scheme: dark) {
-      :root { --bg: #000; --card: #1c1c1e; --text: #f5f5f7; --text-2: rgba(235,235,245,.7); --line: rgba(235,235,245,.14); --accent: #2997ff; }
+      :root { --bg: #000; --card: #1c1c1e; --text: #f5f5f7; --text-2: rgba(235,235,245,.7); --line: rgba(235,235,245,.14); --accent: #2997ff; --fill: rgba(118,118,128,.24); --thumb: #636366; }
     }
     * { box-sizing: border-box; }
     body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif; -webkit-font-smoothing: antialiased; }
     main { max-width: 720px; margin: 0 auto; padding: 48px 16px 64px; }
     a { color: var(--accent); text-decoration: none; }
     a:hover { text-decoration: underline; }
+    .top { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
     .back { font-size: .9375rem; }
+    .lang-switch { display: inline-flex; padding: 2px; border-radius: 8px; background: var(--fill); }
+    .lang-switch button { appearance: none; border: 0; background: transparent; color: var(--text-2); font: inherit; font-size: .75rem; font-weight: 600; min-width: 2.25rem; min-height: 28px; padding: 0 .5rem; border-radius: 6px; cursor: pointer; }
+    .lang-switch button[aria-pressed="true"] { background: var(--thumb); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,.12); }
     h1 { font-size: 2.25rem; letter-spacing: -.02em; margin: 1rem 0 2rem; }
     section { background: var(--card); border-radius: 18px; padding: 24px; margin-bottom: 20px; }
     h2 { font-size: 1.25rem; letter-spacing: -.01em; margin: 0 0 .75rem; }
@@ -26,56 +30,124 @@
     th, td { text-align: left; padding: .55rem .5rem .55rem 0; border-bottom: 1px solid var(--line); vertical-align: top; }
     th { color: var(--text-2); font-weight: 500; }
     td { color: var(--text); }
-    .todo { background: #ffd60a; color: #1d1d1f; padding: 0 .25em; border-radius: 4px; }
+    [data-l][hidden] { display: none; }
   </style>
 </head>
 <body>
 <main>
-  <a class="back" href="./">‹ Zurück zu TextMold 3D</a>
-  <h1>Datenschutz &amp; Lizenzen</h1>
+  <div class="top">
+    <a class="back" href="./"><span data-l="de">‹ Zurück zu TextMold 3D</span><span data-l="en" hidden>‹ Back to TextMold 3D</span></a>
+    <div class="lang-switch" role="group" aria-label="Sprache / Language">
+      <button type="button" data-lang="de" lang="de">DE</button>
+      <button type="button" data-lang="en" lang="en">EN</button>
+    </div>
+  </div>
+  <h1><span data-l="de">Datenschutz &amp; Lizenzen</span><span data-l="en" hidden>Privacy &amp; Licenses</span></h1>
 
   <section id="datenschutz">
-    <h2>Datenschutz</h2>
-    <h3>Verantwortlich</h3>
-    <p>Dennis Voigtländer<br>E-Mail: <a href="mailto:textmold3d@gmail.com">textmold3d@gmail.com</a></p>
+    <div data-l="de">
+      <h2>Datenschutz</h2>
+      <h3>Verantwortlich</h3>
+      <p>Dennis Voigtländer<br>E-Mail: <a href="mailto:textmold3d@gmail.com">textmold3d@gmail.com</a></p>
 
-    <h3>Was diese Seite verarbeitet</h3>
-    <ul>
-      <li>Dein Text und alle Einstellungen werden <strong>nur in deinem Browser</strong> verarbeitet. Die 3D-Modelle entstehen auf deinem Gerät und werden nirgendwohin übertragen.</li>
-      <li>Deine letzten Einstellungen werden im lokalen Speicher deines Browsers (localStorage) abgelegt, damit sie beim nächsten Besuch wieder da sind. Sie verlassen dein Gerät nicht. Du kannst sie jederzeit über die Website-Daten deines Browsers löschen.</li>
-      <li>Es gibt <strong>keine Cookies, kein Tracking, keine Werbung</strong> und keine eingebundenen Inhalte von Drittanbietern. Schriften und Programmbibliotheken liegen auf demselben Server wie diese Seite.</li>
-    </ul>
+      <h3>Was diese Seite verarbeitet</h3>
+      <ul>
+        <li>Dein Text und alle Einstellungen werden <strong>nur in deinem Browser</strong> verarbeitet. Die 3D-Modelle entstehen auf deinem Gerät und werden nirgendwohin übertragen.</li>
+        <li>Deine letzten Einstellungen und die gewählte Sprache werden im lokalen Speicher deines Browsers (localStorage) abgelegt, damit sie beim nächsten Besuch wieder da sind. Sie verlassen dein Gerät nicht. Du kannst sie jederzeit über die Website-Daten deines Browsers löschen.</li>
+        <li>Es gibt <strong>keine Cookies, kein Tracking, keine Werbung</strong> und keine eingebundenen Inhalte von Drittanbietern. Schriften und Programmbibliotheken liegen auf demselben Server wie diese Seite.</li>
+      </ul>
 
-    <h3>Hosting</h3>
-    <p>Die Seite wird über GitHub Pages bereitgestellt (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie deine IP-Adresse, Datum und Uhrzeit sowie den Browsertyp, um die Seite auszuliefern und vor Missbrauch zu schützen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren und funktionierenden Bereitstellung). Daten können dabei in die USA übermittelt werden; GitHub ist unter dem EU-US Data Privacy Framework zertifiziert. Details: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub-Datenschutzerklärung</a>.</p>
+      <h3>Hosting</h3>
+      <p>Die Seite wird über GitHub Pages bereitgestellt (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). Beim Aufruf verarbeitet GitHub technisch notwendige Daten wie deine IP-Adresse, Datum und Uhrzeit sowie den Browsertyp, um die Seite auszuliefern und vor Missbrauch zu schützen. Rechtsgrundlage ist Art. 6 Abs. 1 lit. f DSGVO (berechtigtes Interesse an einer sicheren und funktionierenden Bereitstellung). Daten können dabei in die USA übermittelt werden; GitHub ist unter dem EU-US Data Privacy Framework zertifiziert. Details: <a href="https://docs.github.com/de/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub-Datenschutzerklärung</a>.</p>
 
-    <h3>Deine Rechte</h3>
-    <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO). Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren.</p>
+      <h3>Deine Rechte</h3>
+      <p>Du hast das Recht auf Auskunft, Berichtigung, Löschung, Einschränkung der Verarbeitung, Datenübertragbarkeit und Widerspruch (Art. 15–21 DSGVO). Außerdem kannst du dich bei einer Datenschutz-Aufsichtsbehörde beschweren.</p>
+    </div>
+    <div data-l="en" hidden>
+      <h2>Privacy</h2>
+      <h3>Controller</h3>
+      <p>Dennis Voigtländer<br>Email: <a href="mailto:textmold3d@gmail.com">textmold3d@gmail.com</a></p>
+
+      <h3>What this site processes</h3>
+      <ul>
+        <li>Your text and all settings are processed <strong>only in your browser</strong>. The 3D models are created on your device and are not sent anywhere.</li>
+        <li>Your last settings and your chosen language are kept in your browser’s local storage (localStorage) so they are there on your next visit. They never leave your device. You can delete them at any time via your browser’s site data.</li>
+        <li>There are <strong>no cookies, no tracking, no ads</strong> and no embedded third-party content. Fonts and libraries are served from the same server as this page.</li>
+      </ul>
+
+      <h3>Hosting</h3>
+      <p>This site is hosted on GitHub Pages (GitHub, Inc., 88 Colin P. Kelly Jr. Street, San Francisco, CA 94107, USA). When you visit, GitHub processes technically necessary data such as your IP address, date and time, and browser type in order to deliver the site and protect it from abuse. The legal basis is Art. 6(1)(f) GDPR (legitimate interest in secure and reliable delivery). Data may be transferred to the USA; GitHub is certified under the EU-US Data Privacy Framework. Details: <a href="https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">GitHub Privacy Statement</a>.</p>
+
+      <h3>Your rights</h3>
+      <p>You have the right of access, rectification, erasure, restriction of processing, data portability and objection (Art. 15–21 GDPR). You can also lodge a complaint with a data protection supervisory authority.</p>
+    </div>
   </section>
 
   <section id="lizenzen">
-    <h2>Schriften &amp; Open Source</h2>
-    <p>Diese Seite nutzt freie Software und freie Schriften. Danke an alle Autorinnen und Autoren.</p>
+    <h2><span data-l="de">Schriften &amp; Open Source</span><span data-l="en" hidden>Fonts &amp; open source</span></h2>
+    <p data-l="de">Diese Seite nutzt freie Software und freie Schriften. Danke an alle Autorinnen und Autoren.</p>
+    <p data-l="en" hidden>This site uses free software and free fonts. Thanks to all their authors.</p>
     <table>
-      <thead><tr><th>Bestandteil</th><th>Urheber</th><th>Lizenz</th></tr></thead>
+      <thead><tr>
+        <th><span data-l="de">Bestandteil</span><span data-l="en" hidden>Component</span></th>
+        <th><span data-l="de">Urheber</span><span data-l="en" hidden>Author</span></th>
+        <th><span data-l="de">Lizenz</span><span data-l="en" hidden>License</span></th>
+      </tr></thead>
       <tbody>
         <tr><td>Titan One</td><td>Rodrigo Fuenzalida</td><td><a href="fonts/TitanOne-OFL.txt">SIL OFL 1.1</a></td></tr>
         <tr><td>Lilita One</td><td>Juan Montoreano</td><td><a href="fonts/LilitaOne-OFL.txt">SIL OFL 1.1</a></td></tr>
         <tr><td>Sniglet</td><td>Haley Fiege, Brenda Gallo, Pablo Impallari</td><td><a href="fonts/Sniglet-OFL.txt">SIL OFL 1.1</a></td></tr>
         <tr><td>Chewy</td><td>Font Diner, Inc DBA Sideshow</td><td><a href="fonts/Chewy-LICENSE-Apache2.txt">Apache 2.0</a></td></tr>
         <tr><td>three.js 0.160.0</td><td>three.js authors</td><td><a href="vendor/three/LICENSE">MIT</a></td></tr>
-        <tr><td>fflate (über three.js)</td><td>Arjun Barrett</td><td>MIT</td></tr>
-        <tr><td>opentype.js 1.3.4</td><td>Frederik De Bleser u. a.</td><td><a href="vendor/opentype-LICENSE">MIT</a></td></tr>
+        <tr><td>fflate <span data-l="de">(über three.js)</span><span data-l="en" hidden>(via three.js)</span></td><td>Arjun Barrett</td><td>MIT</td></tr>
+        <tr><td>opentype.js 1.3.4</td><td>Frederik De Bleser <span data-l="de">u. a.</span><span data-l="en" hidden>et al.</span></td><td><a href="vendor/opentype-LICENSE">MIT</a></td></tr>
         <tr><td>clipper-lib 6.4.2</td><td>Angus Johnson</td><td><a href="vendor/clipper-LICENSE.txt">Boost 1.0</a></td></tr>
       </tbody>
     </table>
-    <p>Die Modelle, die du hier erzeugst, gehören dir. Du darfst sie frei nutzen, drucken und auch verkaufen. Die Schriftlizenzen erlauben das ausdrücklich für Werke, die mit der Schrift erstellt werden.</p>
+    <p data-l="de">Die Modelle, die du hier erzeugst, gehören dir. Du darfst sie frei nutzen, drucken und auch verkaufen. Die Schriftlizenzen erlauben das ausdrücklich für Werke, die mit der Schrift erstellt werden.</p>
+    <p data-l="en" hidden>The models you create here are yours. You may use, print and even sell them freely. The font licenses explicitly allow this for works created with the fonts.</p>
   </section>
 
   <section id="haftung">
-    <h2>Ohne Gewähr</h2>
-    <p>Dies ist ein privates, kostenloses Projekt. Ich übernehme keine Gewähr dafür, dass die erzeugten Dateien fehlerfrei oder auf jedem Drucker druckbar sind.</p>
+    <div data-l="de">
+      <h2>Ohne Gewähr</h2>
+      <p>Dies ist ein privates, kostenloses Projekt. Ich übernehme keine Gewähr dafür, dass die erzeugten Dateien fehlerfrei oder auf jedem Drucker druckbar sind.</p>
+    </div>
+    <div data-l="en" hidden>
+      <h2>No warranty</h2>
+      <p>This is a private, free project. I give no guarantee that the generated files are free of errors or printable on every printer.</p>
+    </div>
   </section>
 </main>
+<script>
+  // Same language logic as the generator: ?lang=, then the saved choice, then the browser.
+  (function () {
+    var KEY = 'textmold3d:lang', LANGS = ['de', 'en'];
+    var titles = { de: 'Datenschutz & Lizenzen – TextMold 3D', en: 'Privacy & Licenses – TextMold 3D' };
+    function detect() {
+      var p = new URLSearchParams(location.search).get('lang');
+      if (LANGS.indexOf(p) >= 0) return p;
+      try { var s = localStorage.getItem(KEY); if (LANGS.indexOf(s) >= 0) return s; } catch (e) {}
+      var b = (navigator.languages || [navigator.language || 'en']).map(function (l) { return l.slice(0, 2).toLowerCase(); });
+      for (var i = 0; i < b.length; i++) if (LANGS.indexOf(b[i]) >= 0) return b[i];
+      return 'en';
+    }
+    function apply(lang) {
+      document.documentElement.lang = lang;
+      document.title = titles[lang];
+      document.querySelectorAll('[data-l]').forEach(function (el) { el.hidden = el.dataset.l !== lang; });
+      document.querySelectorAll('[data-lang]').forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.lang === lang)); });
+      document.querySelector('.back').href = './?lang=' + lang;
+    }
+    document.querySelectorAll('[data-lang]').forEach(function (b) {
+      b.addEventListener('click', function () {
+        try { localStorage.setItem(KEY, b.dataset.lang); } catch (e) {}
+        var u = new URL(location.href); u.searchParams.set('lang', b.dataset.lang); history.replaceState(null, '', u);
+        apply(b.dataset.lang);
+      });
+    });
+    apply(detect());
+  })();
+</script>
 </body>
 </html>

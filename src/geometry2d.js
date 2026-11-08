@@ -237,7 +237,7 @@ export function buildLayers(shape, p) {
     if (plate) plate = union([...plate, ...tab]);
     else if (outline) outline = union([...outline, ...tab]);
     else tabOnly = difference(tab, letters);
-    if (p.keyring.hole < 3) warnings.push('Loch unter 3 mm – der Ring passt evtl. nicht durch.');
+    if (p.keyring.hole < 3) warnings.push({ id: 'warn.smallHole' });
   }
 
   const cut = (paths) => (hole ? difference(paths, hole) : paths);
@@ -259,10 +259,10 @@ export function buildLayers(shape, p) {
     : { id: 'letters', label: 'Buchstaben', paths: toFlat(cut(letters)), glyphs, z0: z, height: p.height, profile: 'flat', fillet: Math.min(1.2, p.height / 2), color: p.colors.letters });
 
   if (islands > 1 && !plate && !outline) {
-    warnings.push(`Das Modell zerfällt in ${islands} Einzelteile (einzelne Buchstaben oder i-Punkte) – Rundung erhöhen, Abstand verringern oder Outline/Sockel einschalten.`);
+    warnings.push({ id: 'warn.islands', n: islands });
   }
   if (p.style === 'inflated' && p.edge < 0.6) {
-    warnings.push('Randhöhe unter 0,6 mm – die dünne Kante kann sich vom Bett lösen.');
+    warnings.push({ id: 'warn.thinEdge' });
   }
 
   const b = bounds(plate || footprint);
@@ -278,7 +278,7 @@ export function buildLayers(shape, p) {
     info.depth = (all.maxY - all.minY) / S;
   }
   if (info.width > p.bed || info.depth > p.bed) {
-    warnings.push(`Größer als das Druckbett (${p.bed} mm) – im Slicer zerschneiden (Schneidewerkzeug) und in Teilen drucken.`);
+    warnings.push({ id: 'warn.oversize', bed: p.bed });
   }
   return { layers, warnings, info };
 }

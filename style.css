@@ -458,3 +458,16 @@ select {
 .panel-foot { margin-top: 1.5rem; padding-top: 0.75rem; border-top: 1px solid rgba(127,127,127,0.18); display: flex; gap: 0.5rem; flex-wrap: wrap; font-size: 0.75rem; color: var(--text-3); }
 .panel-foot a { color: var(--text-2); text-decoration: none; }
 .panel-foot a:hover { color: var(--text); text-decoration: underline; }
+
+/* Language switch (DE / EN) next to the title */
+.head-row { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; }
+.lang-switch { display: inline-flex; padding: 2px; border-radius: 8px; background: var(--fill); flex: none; }
+.lang-switch button {
+  appearance: none; border: 0; background: transparent; color: var(--text-2);
+  font: inherit; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em;
+  min-width: 2.25rem; min-height: 28px; padding: 0 0.5rem; border-radius: 6px; cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+}
+.lang-switch button:hover { color: var(--text); }
+.lang-switch button[aria-pressed="true"] { background: var(--thumb, #fff); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+.lang-switch button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
