@@ -397,13 +397,15 @@ function renderTips(info) {
   const hasBase = state.plate.on || state.outline.on;
   const layer = inflated ? 0.12 : 0.16;
   const mm = (v) => `${fmt.format(v)} mm`;
-  const rows = [
+  const rows = [];
+  if (info.pieces > 1) rows.push([t('tip.parts'), t('tip.parts.v', { n: info.pieces }), t('tip.parts.n')]);
+  rows.push(
     [t('tip.orientation'), t('tip.orientation.v'), t('tip.orientation.n')],
     [t('tip.layer'), mm(layer), inflated ? t('tip.layer.nInflated') : t('tip.layer.nFlat')],
     [t('tip.walls'), small ? '4' : '3', small ? t('tip.walls.nSmall') : ''],
     [t('tip.top'), inflated ? '7' : '5', inflated ? t('tip.top.n') : ''],
     [t('tip.infill'), `${small || state.keyring.on ? 20 : 12} % Gyroid`, ''],
-  ];
+  );
   const thinEdge = inflated && state.edge < 1 && !hasBase;
   if (thinEdge) rows.push(['Brim', '5 mm', t('tip.brim.nThin')]);
   else if (small && !state.plate.on) rows.push(['Brim', '3 mm', t('tip.brim.nSmall')]);

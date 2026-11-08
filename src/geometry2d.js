@@ -258,9 +258,6 @@ export function buildLayers(shape, p) {
     ? { id: 'letters', label: 'Buchstaben', paths: toFlat(cut(letters)), glyphs, z0: z, height: p.height, profile: 'dome', edge: Math.min(p.edge, p.height), puff: p.puff / 100, color: p.colors.letters }
     : { id: 'letters', label: 'Buchstaben', paths: toFlat(cut(letters)), glyphs, z0: z, height: p.height, profile: 'flat', fillet: Math.min(1.2, p.height / 2), color: p.colors.letters });
 
-  if (islands > 1 && !plate && !outline) {
-    warnings.push({ id: 'warn.islands', n: islands });
-  }
   if (p.style === 'inflated' && p.edge < 0.6) {
     warnings.push({ id: 'warn.thinEdge' });
   }
@@ -270,6 +267,8 @@ export function buildLayers(shape, p) {
     width: (b.maxX - b.minX) / S,
     depth: (b.maxY - b.minY) / S,
     height: z + p.height,
+    // separate pieces that will print loose (letters that don't touch, i-dots)
+    pieces: plate || outline ? 1 : islands,
   };
   if (p.keyring.on && !plate) {
     // the tab extends the footprint

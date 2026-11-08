@@ -80,10 +80,11 @@ const STRINGS = {
     'err.fontMissing': (v) => `Schrift ${v.name} nicht gefunden`,
 
     'warn.smallHole': 'Loch unter 3 mm – der Ring passt evtl. nicht durch.',
-    'warn.islands': (v) => `Das Modell zerfällt in ${v.n} Einzelteile (einzelne Buchstaben oder i-Punkte) – Rundung erhöhen, Abstand verringern oder Outline/Sockel einschalten.`,
     'warn.thinEdge': 'Randhöhe unter 0,6 mm – die dünne Kante kann sich vom Bett lösen.',
     'warn.oversize': (v) => `Größer als das Druckbett (${v.bed} mm) – im Slicer zerschneiden (Schneidewerkzeug) und in Teilen drucken.`,
 
+    'tip.parts': 'Teile', 'tip.parts.v': (v) => `${v.n} einzeln`,
+    'tip.parts.n': 'Die Buchstaben berühren sich nicht und werden lose gedruckt – z.B. für Magnete. Für ein Stück: Abstand verringern, Rundung erhöhen oder Outline/Sockel einschalten.',
     'tip.orientation': 'Ausrichtung', 'tip.orientation.v': 'Flach aufs Bett', 'tip.orientation.n': 'Unterseite ist eben – keine Stützen nötig.',
     'tip.layer': 'Schichthöhe', 'tip.layer.nInflated': 'Feine Schichten machen die Kuppeln glatt (Profil „0.12mm Fine“).', 'tip.layer.nFlat': 'Profil „0.16mm Optimal“.',
     'tip.walls': 'Wände', 'tip.walls.nSmall': 'Kleine Teile werden dadurch stabil.',
@@ -172,10 +173,11 @@ const STRINGS = {
     'err.fontMissing': (v) => `Font ${v.name} not found`,
 
     'warn.smallHole': 'Hole under 3 mm – a key ring may not fit through.',
-    'warn.islands': (v) => `The model falls apart into ${v.n} separate pieces (single letters or i-dots) – increase roundness, reduce spacing or turn on outline/base plate.`,
     'warn.thinEdge': 'Edge height under 0.6 mm – the thin edge may lift off the bed.',
     'warn.oversize': (v) => `Larger than the print bed (${v.bed} mm) – cut it in the slicer (cut tool) and print in parts.`,
 
+    'tip.parts': 'Parts', 'tip.parts.v': (v) => `${v.n} separate`,
+    'tip.parts.n': 'The letters don’t touch and print as loose pieces – e.g. for magnets. For one piece: reduce spacing, increase roundness or turn on outline/base plate.',
     'tip.orientation': 'Orientation', 'tip.orientation.v': 'Flat on the bed', 'tip.orientation.n': 'The bottom is flat – no supports needed.',
     'tip.layer': 'Layer height', 'tip.layer.nInflated': 'Fine layers make the domes smooth (profile “0.12mm Fine”).', 'tip.layer.nFlat': 'Profile “0.16mm Optimal”.',
     'tip.walls': 'Walls', 'tip.walls.nSmall': 'Makes small parts sturdy.',
