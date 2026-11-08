@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>TextMold 3D – Namen &amp; Bubble Letters als STL/3MF für den 3D-Druck</title>
+  <meta name="description" content="Verwandle Namen und Texte in druckfertige 3D-Buchstaben – aufgeblasen als Bubble Letters oder flach. Kostenlos, direkt im Browser, Export als STL und 3MF für Bambu Lab, Prusa &amp; Co.">
+  <meta property="og:title" content="TextMold 3D – Namen als 3D-Druck-Modell">
+  <meta property="og:description" content="Text eingeben, Schrift wählen, als STL/3MF herunterladen. Bubble Letters oder flache Schrift, kostenlos im Browser.">
+  <meta property="og:type" content="website">
+  <link rel="stylesheet" href="style.css">
+  <script src="vendor/clipper.js"></script>
+  <script src="vendor/opentype.min.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "./vendor/three/three.module.js",
+        "three/addons/": "./vendor/three/addons/"
+      }
+    }
+  </script>
+</head>
+<body>
+  <div id="viewport" aria-label="3D-Vorschau"></div>
+
+  <aside class="panel glass" id="panel">
+    <header class="panel-head">
+      <h1>TextMold 3D</h1>
+      <p class="sub">Text eingeben, anpassen, drucken.</p>
+    </header>
+
+    <section class="block">
+      <label class="label" for="text">Text</label>
+      <textarea id="text" data-key="text" rows="2" spellcheck="false" autocomplete="off"></textarea>
+    </section>
+
+    <section class="block">
+      <span class="label">Vorlage</span>
+      <div class="chips" id="presets">
+        <button class="chip" data-preset="name">Bubble-Name</button>
+        <button class="chip" data-preset="sign">Namensschild</button>
+        <button class="chip" data-preset="keychain">Anhänger</button>
+      </div>
+    </section>
+
+    <section class="block">
+      <span class="label">Schrift</span>
+      <div class="chips" id="fonts"></div>
+      <input type="file" id="fontFile" accept=".ttf,.otf,font/ttf,font/otf" hidden>
+    </section>
+
+    <section class="block">
+      <span class="label">Stil</span>
+      <div class="seg" data-key="style" role="radiogroup" aria-label="Stil">
+        <span class="seg-thumb"></span>
+        <button data-value="inflated" role="radio">Aufgeblasen</button>
+        <button data-value="flat" role="radio">Flach</button>
+      </div>
+    </section>
+
+    <section class="block sliders">
+      <div class="slider">
+        <div class="row-head"><label for="width">Breite</label><output data-for="width"></output></div>
+        <input type="range" id="width" data-key="width" min="30" max="400" step="1" data-unit="mm" data-input-max="1000">
+      </div>
+      <div class="slider">
+        <div class="row-head"><label for="height">Höhe der Buchstaben</label><output data-for="height"></output></div>
+        <input type="range" id="height" data-key="height" min="2" max="30" step="0.5" data-unit="mm" data-input-max="80">
+      </div>
+      <div class="slider">
+        <div class="row-head"><label for="bubble">Rundung</label><output data-for="bubble"></output></div>
+        <input type="range" id="bubble" data-key="bubble" min="-3" max="4" step="0.1" data-unit="%">
+      </div>
+      <div class="slider">
+        <div class="row-head"><label for="spacing">Buchstabenabstand</label><output data-for="spacing"></output></div>
+        <input type="range" id="spacing" data-key="spacing" min="-12" max="15" step="0.5" data-unit="%">
+      </div>
+      <div class="slider">
+        <div class="row-head"><label for="stretchX">Horizontal strecken</label><output data-for="stretchX"></output></div>
+        <input type="range" id="stretchX" data-key="stretchX" min="50" max="200" step="1" data-unit="%" data-input-min="20" data-input-max="400">
+      </div>
+      <div class="slider">
+        <div class="row-head"><label for="stretchY">Vertikal strecken</label><output data-for="stretchY"></output></div>
+        <input type="range" id="stretchY" data-key="stretchY" min="50" max="200" step="1" data-unit="%" data-input-min="20" data-input-max="400">
+      </div>
+    </section>
+
+    <details class="group" data-show="style=inflated">
+      <summary>Wölbung</summary>
+      <div class="content"><div class="inner">
+        <div class="slider">
+          <div class="row-head"><label for="edge">Randhöhe</label><output data-for="edge"></output></div>
+          <input type="range" id="edge" data-key="edge" min="0" max="10" step="0.2" data-unit="mm">
+        </div>
+        <div class="slider">
+          <div class="row-head"><label for="puff">Prallheit</label><output data-for="puff"></output></div>
+          <input type="range" id="puff" data-key="puff" min="15" max="100" step="1" data-unit="%">
+        </div>
+        <p class="hint">Weniger Prallheit gibt eine flachere Oberseite mit runden Kanten – wie ein Kissen.</p>
+      </div></div>
+    </details>
+
+    <details class="group">
+      <summary>Outline <span class="badge" data-badge="outline.on">An</span></summary>
+      <div class="content"><div class="inner">
+        <label class="switch-row"><span>Outline-Rand</span><input type="checkbox" role="switch" data-key="outline.on"></label>
+        <div data-enable="outline.on">
+          <div class="slider">
+            <div class="row-head"><label for="ow">Randbreite</label><output data-for="outline.width"></output></div>
+            <input type="range" id="ow" data-key="outline.width" min="1" max="12" step="0.5" data-unit="mm">
+          </div>
+          <div class="slider">
+            <div class="row-head"><label for="oh">Randhöhe</label><output data-for="outline.height"></output></div>
+            <input type="range" id="oh" data-key="outline.height" min="1" max="10" step="0.2" data-unit="mm">
+          </div>
+        </div>
+      </div></div>
+    </details>
+
+    <details class="group">
+      <summary>Sockelplatte <span class="badge" data-badge="plate.on">An</span></summary>
+      <div class="content"><div class="inner">
+        <label class="switch-row"><span>Sockelplatte</span><input type="checkbox" role="switch" data-key="plate.on"></label>
+        <div data-enable="plate.on">
+          <div class="slider">
+            <div class="row-head"><label for="pm">Rand</label><output data-for="plate.margin"></output></div>
+            <input type="range" id="pm" data-key="plate.margin" min="0" max="30" step="0.5" data-unit="mm">
+          </div>
+          <div class="slider">
+            <div class="row-head"><label for="pt">Dicke</label><output data-for="plate.thickness"></output></div>
+            <input type="range" id="pt" data-key="plate.thickness" min="1" max="10" step="0.2" data-unit="mm">
+          </div>
+          <div class="slider">
+            <div class="row-head"><label for="pr">Eckenradius</label><output data-for="plate.radius"></output></div>
+            <input type="range" id="pr" data-key="plate.radius" min="0" max="30" step="0.5" data-unit="mm">
+          </div>
+        </div>
+      </div></div>
+    </details>
+
+    <details class="group">
+      <summary>Schlüsselanhänger <span class="badge" data-badge="keyring.on">An</span></summary>
+      <div class="content"><div class="inner">
+        <label class="switch-row"><span>Öse anfügen</span><input type="checkbox" role="switch" data-key="keyring.on"></label>
+        <div data-enable="keyring.on">
+          <div class="seg small" data-key="keyring.side" role="radiogroup" aria-label="Position der Öse">
+            <span class="seg-thumb"></span>
+            <button data-value="left" role="radio">Links</button>
+            <button data-value="top" role="radio">Oben</button>
+          </div>
+          <div class="slider">
+            <div class="row-head"><label for="kh">Loch-Ø</label><output data-for="keyring.hole"></output></div>
+            <input type="range" id="kh" data-key="keyring.hole" min="2" max="10" step="0.5" data-unit="mm">
+          </div>
+          <div class="slider">
+            <div class="row-head"><label for="kw">Ringstärke</label><output data-for="keyring.wall"></output></div>
+            <input type="range" id="kw" data-key="keyring.wall" min="1.5" max="6" step="0.5" data-unit="mm">
+          </div>
+        </div>
+      </div></div>
+    </details>
+
+    <details class="group">
+      <summary>Farben</summary>
+      <div class="content"><div class="inner">
+        <label class="color-row"><span>Buchstaben</span><input type="color" data-key="colors.letters"></label>
+        <label class="color-row"><span>Outline &amp; Sockel</span><input type="color" data-key="colors.base"></label>
+        <p class="hint">Nur für die Vorschau und das 3MF. Einfarbig drucken: STL nehmen.</p>
+      </div></div>
+    </details>
+
+    <details class="group">
+      <summary>Druck</summary>
+      <div class="content"><div class="inner">
+        <span class="label">Exportqualität</span>
+        <div class="seg small" data-key="quality" role="radiogroup" aria-label="Exportqualität">
+          <span class="seg-thumb"></span>
+          <button data-value="draft" role="radio">Entwurf</button>
+          <button data-value="standard" role="radio">Standard</button>
+          <button data-value="fine" role="radio">Fein</button>
+        </div>
+        <label class="select-row"><span>Druckbett</span>
+          <select data-key="bed">
+            <option value="180">180 mm (A1 mini)</option>
+            <option value="220">220 mm</option>
+            <option value="256">256 mm (X1, P1, A1)</option>
+            <option value="350">350 mm</option>
+          </select>
+        </label>
+      </div></div>
+    </details>
+    <details class="group" open>
+      <summary>Druckempfehlung</summary>
+      <div class="content"><div class="inner">
+        <div class="tips" id="tips"></div>
+        <p class="hint">Für PLA mit 0,4-mm-Düse (z.B. Bambu Studio). Die Werte passen sich an dein Modell an.</p>
+      </div></div>
+    </details>
+    <footer class="panel-foot">
+      <a href="rechtliches.html#datenschutz">Datenschutz</a>
+      <span aria-hidden="true">·</span>
+      <a href="rechtliches.html#lizenzen">Schriften &amp; Lizenzen</a>
+    </footer>
+  </aside>
+
+  <div class="dock glass" id="dock">
+    <div class="dock-info">
+      <div class="dims" id="dims">–</div>
+      <div class="status" id="status" aria-live="polite"></div>
+    </div>
+    <div class="dock-actions">
+      <button class="btn secondary" id="export3mf" title="Mehrere Teile – im Slicer je eigenes Filament">3MF</button>
+      <button class="btn primary" id="exportStl">STL sichern</button>
+    </div>
+  </div>
+  <ul class="warnings" id="warnings" aria-live="polite"></ul>
+
+  <button class="fab glass" id="resetView" aria-label="Ansicht zurücksetzen" title="Ansicht zurücksetzen">
+    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.4-5.7M4 4v4.5h4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </button>
+
+  <script type="module" src="src/app.js"></script>
+</body>
+</html>
