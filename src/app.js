@@ -458,6 +458,8 @@ async function exportFile(kind, btn) {
     const tris = meshes.reduce((s, m) => s + m.indices.length / 3, 0);
     if (kind === 'stl') download(toSTL(meshes[0]), `${fileBase()}.stl`);
     else download(to3MF(meshes, { name: state.text.trim() || 'Bubble Letters', bed: Number(state.bed) }), `${fileBase()}.3mf`);
+    // anonymous download counter (GoatCounter event; no-op if the script is blocked)
+    try { window.goatcounter?.count?.({ path: `export-${kind}`, title: `${kind.toUpperCase()} export`, event: true }); } catch { /* ignore */ }
     setStatus('status.saved', { kind: kind.toUpperCase(), k: fmt.format(Math.round(tris / 1000)) });
   } catch (err) {
     console.error(err);

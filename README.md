@@ -8,7 +8,7 @@ Namen und Texte im Browser in 3D-Buchstaben verwandeln (aufgeblasen als Bubble L
 python3 -m http.server 8000
 ```
 
-Im Projektordner ausführen, dann <http://localhost:8000> öffnen. Alle Libraries (three.js, opentype.js, clipper-lib) liegen lokal in `vendor/`, die Schriften in `fonts/`. Die Seite lädt nichts von Drittanbietern.
+Im Projektordner ausführen, dann <http://localhost:8000> öffnen. Alle Libraries (three.js, opentype.js, clipper-lib) liegen lokal in `vendor/`, die Schriften in `fonts/`. Die Seite lädt nichts von Drittanbietern. Einzige Ausnahme: Die cookiefreie Besucherstatistik von GoatCounter (`vendor/goatcounter/count.js`, lokal gehostet) sendet Zählungen an `textmold3d.goatcounter.com`. Auf localhost zählt sie nicht.
 
 ## Funktionen
 
